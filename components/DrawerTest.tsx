@@ -172,7 +172,6 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
         >
           {children}
         </div>
-
         <DrawerContent className="sm:px-[10%] md:[15%] lg:px-[20%]">
           <form onSubmit={(e) => handleSubmit(e)}>
             <DrawerHeader className="max-h-screen overflow-y-scroll">

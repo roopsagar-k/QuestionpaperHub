@@ -74,7 +74,7 @@ const SideBar = () => {
   }, [user]);
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/login" });
+    await signOut({ callbackUrl: "/" });
   };
 
   const Home = () => {

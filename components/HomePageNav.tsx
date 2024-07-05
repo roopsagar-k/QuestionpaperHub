@@ -109,7 +109,7 @@ const HomePageNav = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={async () => {
-                  await signOut({ callbackUrl: "/login" });
+                  await signOut({ callbackUrl: "/" });
             }}>
               <LogOut className="mr-2 h-4 w-4" />
               <span className="mr-2">Log out</span>
