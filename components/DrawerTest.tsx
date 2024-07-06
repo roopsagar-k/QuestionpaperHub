@@ -26,6 +26,7 @@ import axios from "axios";
 import AuthModal from "./AuthModal";
 import Register from "./Register";
 import Login from "./Login";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import pdfToImages from "@/lib/pdfToImage";
 import { useUserContext } from "@/context/UserContext";
 import { Loader2 } from "lucide-react";
@@ -43,9 +44,12 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   const [text, setText] = useState<string>("");
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { user } = useUserContext();
+  const { user, setUser } = useUserContext();
+  const [arrayOfObjects, setArrayOfObjects] = useState<any>([]);
 
   const workerRef = useRef<Tesseract.Worker | null>(null);
+
+
   useEffect(() => {
     async function worker() {
       workerRef.current = await createWorker({
@@ -71,6 +75,8 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
     await worker?.loadLanguage("eng");
     await worker?.initialize("eng");
 
+    let ocrText = "";
+
     if (files && files[0].type === "application/pdf") {
       setFile(files[0]);
       setIsProcessing(true);
@@ -81,6 +87,7 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
       for (let i = 0; i < imageUrls.length; i++) {
         const response = await worker?.recognize(imageUrls[i]);
         console.log(response?.data.text, "response");
+        ocrText += " " + response?.data.text;
         setText((prev) => prev + " " + response?.data.text);
       }
       setIsProcessing(false);
@@ -93,9 +100,56 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
         const url = URL.createObjectURL(files[i]);
         const response = await worker?.recognize(url);
         console.log(response?.data.text, "response");
+        ocrText += " " + response?.data.text;
         setText((prev) => prev + " " + response?.data.text);
       }
       setIsProcessing(false);
+      setIsLoading(true);
+    }
+
+    const blob = new Blob([ocrText], { type: "text/plain" });
+    const textFile = new File([blob], "converted-text.txt", {
+      type: "text/plain",
+    });
+    const textFileBuffer = await textFile.arrayBuffer();
+
+    function fileToGenerativePart(buffer: ArrayBuffer, mimeType: string) {
+      return {
+        inlineData: {
+          data: Buffer.from(buffer).toString("base64"),
+          mimeType,
+        },
+      };
+    }
+
+    const genAI = new GoogleGenerativeAI(
+      process.env.NEXT_PUBLIC_GEMINI_API_KEY as string
+    );
+
+    let resultArray = [];
+
+    try {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+      });
+      console.log("yo brew");
+      const prompt =
+        'Transform the PDF text or images text into an array of JavaScript objects following this structure: [{"question": "", "answer": optionNumber (1, 2, ...), "options": [{"option": ""}, {"option": ""}]}]. Correct any odd symbols, including mathematical, physics, and chemistry symbols, to their correct representations using the actual forms of these symbols (e.g., use "²" instead of "^2" or "<sup>2</sup>"). Ensure the output is in plain JSON format, parsable by JSON.parse(), and does not include any introductory text, variable declarations, or enclosing tags. Make sure to complete the JSON array properly, even if it means missing some questions.';
+      const result = await model.generateContent([
+        prompt,
+        fileToGenerativePart(textFileBuffer, "text/plain"),
+      ]);
+      console.log("Gemini Result: ", result.response);
+      let jsonString = result.response.text().trim();
+      jsonString = jsonString.replace(/```/g, "").replace(/[^\x20-\x7E]/g, "");
+      console.log("JSON String: ", jsonString);
+      resultArray = JSON.parse(jsonString);
+      setArrayOfObjects(resultArray);
+      setIsLoading(false);
+      console.log("Array of Objects: ", resultArray);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error occurred while parsing the pdf:", error);
     }
   };
 
@@ -114,36 +168,28 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
     };
     let testId = "";
     if (file && !ownTest) {
-      const formData = new FormData();
-      const blob = new Blob([text], { type: "text/plain" });
-      const file = new File([blob], "converted-text.txt", {
-        type: "text/plain",
-      });
-      formData.append("file", file);
-      formData.append("data", JSON.stringify(data));
       try {
-        setIsLoading(true);
         console.log("REACHED BEFORE AXIOS");
-        const response = await axios.post("api/tests/file", formData);
+        const response = await axios.post("api/tests/file", {
+          arrayOfObjects,
+          data,
+        });
         console.log("REACHED AFTER AXIOS");
         testId = response.data.testId;
         console.log("respnse 201 chekc", response);
-        if(response.data.error) {
-          console.log(response.data.error)
+        if (response.data.error) {
+          console.log(response.data.error);
         }
         if (response.status === 201) {
-          setIsLoading(false);
           router.push(`/create-paper/${testId}`);
         } else {
-          setIsLoading(false);
           setErrorMessage("Failed to parse your pdf file.");
         }
       } catch (error) {
-        setIsLoading(false);
         setErrorMessage("Failed to parse your pdf file.");
         console.error("Error creating test: ", error);
       }
-    } else {
+    } else if (ownTest) {
       try {
         const res = await axios.post("api/tests", data);
         testId = res.data.testId;
@@ -176,7 +222,7 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
         >
           {children}
         </div>
-        <DrawerContent className="sm:px-[10%] md:[15%] lg:px-[20%]">
+        <DrawerContent className="sm:px-[10%] md:[15%] lg:px-[20%] max-h-[95%]">
           <form onSubmit={(e) => handleSubmit(e)}>
             <DrawerHeader className="max-h-screen overflow-y-scroll">
               <DrawerTitle>Test creation</DrawerTitle>
@@ -187,126 +233,129 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
                 Create test by uploading PDF/Images or Add the questions and
                 options manually
               </DrawerDescription>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                <Card className="flex flex-col gap-3 items-center text-justify sm:flex-row sm:items-start shadow-md sm:text-left p-3">
-                  <div>
-                    <CardTitle className="text-md">
-                      Compose Your Own Test
-                    </CardTitle>
-                    <CardDescription className="text-xs sm:text-sm">
-                      Manually add questions, options, answers, and attach
-                      PDFs/images to create your own question paper.
-                    </CardDescription>
-                  </div>
-                  <Switch
-                    id="own-test"
-                    name="ownTest"
-                    checked={ownTest}
-                    value={ownTest ? "on" : "off"}
-                    onCheckedChange={() => setOwnTest(!ownTest)}
-                  />
-                </Card>
-                <Card className="flex flex-col gap-3 items-center text-justify shadow-md sm:flex-row sm:items-start sm:text-left p-3">
-                  <div>
-                    <CardTitle className=" text-md">Private post</CardTitle>
-                    <CardDescription className="text-xs">
-                      By checking this, your post or test will be visible only
-                      to those who access them via links, not even to your
-                      followers.
-                    </CardDescription>
-                  </div>
-                  <Switch
-                    id="private-post"
-                    name="privatePost"
-                    value={privatePost ? "on" : "off"}
-                    checked={privatePost}
-                    onCheckedChange={() => setPrivatePost(!privatePost)}
-                  />
-                </Card>
-              </div>
-              <Card className="flex items-center justify-center shadow-md relative">
-                <CardContent className="flex flex-col items-center justify-center mt-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-12 h-12"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
-                      clipRule="evenodd"
+              <div className="flex flex-col gap-2 h-full overflow-y-scroll">
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="flex flex-col gap-3 items-center text-justify sm:flex-row sm:items-start shadow-md sm:text-left p-3">
+                    <div>
+                      <CardTitle className="text-md">
+                        Compose Your Own Test
+                      </CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">
+                        Manually add questions, options, answers, and attach
+                        PDFs/images to create your own question paper.
+                      </CardDescription>
+                    </div>
+                    <Switch
+                      id="own-test"
+                      name="ownTest"
+                      checked={ownTest}
+                      value={ownTest ? "on" : "off"}
+                      onCheckedChange={() => setOwnTest(!ownTest)}
                     />
-                  </svg>
-                  <CardDescription className="text-primary">
-                    <p>Choose PDF/images or drag and drop</p>
-                    <p className="text-center text-white mt-2 underline">
-                      {file ? file.name : ""}
-                    </p>
-                  </CardDescription>
-                </CardContent>
-                <Input
-                  className="w-full h-full absolute opacity-0"
-                  id="file"
-                  name="file"
-                  onChange={(e) => onFileChange(e)}
-                  multiple={true}
-                  type="file"
-                  required={!ownTest}
-                  disabled={ownTest}
-                  accept="image/*, application/pdf"
-                />
-              </Card>
-              <div className="flex mt-4 gap-4">
-                <div className="flex flex-col w-full gap-2">
-                  <Label htmlFor="title">Title</Label>
+                  </Card>
+                  <Card className="flex flex-col gap-3 items-center text-justify shadow-md sm:flex-row sm:items-start sm:text-left p-3">
+                    <div>
+                      <CardTitle className=" text-md">Private post</CardTitle>
+                      <CardDescription className="text-xs">
+                        By checking this, your post or test will be visible only
+                        to those who access them via links, not even to your
+                        followers.
+                      </CardDescription>
+                    </div>
+                    <Switch
+                      id="private-post"
+                      name="privatePost"
+                      value={privatePost ? "on" : "off"}
+                      checked={privatePost}
+                      onCheckedChange={() => setPrivatePost(!privatePost)}
+                    />
+                  </Card>
+                </div>
+                <Card className="flex items-center justify-center shadow-md relative">
+                  <CardContent className="flex flex-col items-center justify-center mt-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-12 h-12"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <CardDescription className="text-primary">
+                      <p>Choose PDF/images or drag and drop</p>
+                      <p className="text-center text-white  underline">
+                        {file ? file.name : ""}
+                      </p>
+                    </CardDescription>
+                  </CardContent>
                   <Input
-                    id="title"
-                    name="title"
-                    placeholder="Title"
+                    className="w-full h-full absolute opacity-0"
+                    id="file"
+                    name="file"
+                    onChange={(e) => onFileChange(e)}
+                    multiple={true}
+                    type="file"
+                    required={!ownTest}
+                    disabled={ownTest}
+                    accept="image/*, application/pdf"
+                  />
+                </Card>
+                <div className="flex mt-4 gap-4">
+                  <div className="flex flex-col w-full gap-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      name="title"
+                      placeholder="Title"
+                      type="text"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col w-full gap-2">
+                    <Label htmlFor="title">Duration in mins</Label>
+                    <Input
+                      id="duration"
+                      name="duration"
+                      type="number"
+                      placeholder="Enter the test duration in minutes"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col mt-4 gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    typeof="text"
+                    id="description"
+                    name="description"
+                    placeholder="Share your thoughts about this post..."
+                    required
+                  />
+                </div>
+                <div className="flex flex-col mt-4 gap-2">
+                  <Label htmlFor="tags">Tags</Label>
+                  <Input
+                    id="tags"
+                    name="tags"
                     type="text"
+                    placeholder="Add relevant tags (comma-separated)"
                     required
                   />
                 </div>
-                <div className="flex flex-col w-full gap-2">
-                  <Label htmlFor="title">Duration in mins</Label>
-                  <Input
-                    id="duration"
-                    name="duration"
-                    type="number"
-                    placeholder="Enter the test duration in minutes"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col mt-4 gap-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  typeof="text"
-                  id="description"
-                  name="description"
-                  placeholder="Share your thoughts about this post..."
-                  required
-                />
-              </div>
-              <div className="flex flex-col mt-4 gap-2">
-                <Label htmlFor="tags">Tags</Label>
-                <Input
-                  id="tags"
-                  name="tags"
-                  type="text"
-                  placeholder="Add relevant tags (comma-separated)"
-                  required
-                />
               </div>
             </DrawerHeader>
             <DrawerFooter>
-              <Button disabled={isProcessing} type="submit">
+              <Button disabled={isProcessing || isLoading} type="submit">
                 {isProcessing && (
                   <div className="flex gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>
-                      Analyzing Your Document, This May Take a Moment...
+                      Performing OCR on your document. Sit tight, this might
+                      take a moment...
                     </span>
                   </div>
                 )}

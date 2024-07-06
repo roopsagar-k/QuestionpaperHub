@@ -1,5 +1,5 @@
 "use client";
-import axios from "@/axiosConfig";
+import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import type { Post as PostType } from "../../types/types";

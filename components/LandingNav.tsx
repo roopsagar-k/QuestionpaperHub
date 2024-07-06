@@ -35,10 +35,10 @@ const LandingNav = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <main>
-      <div className="fixed top-0 left-0 right-0 w-full grid grid-cols-2 px-2 py-4 bg-transparent backdrop-blur-sm text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl z-[1000]">
+      <div className="fixed top-0 left-0 right-0 w-full grid grid-cols-2 px-2 py-4 bg-transparent backdrop-blur-sm sm:text-sm md:text-base lg:text-lg xl:text-xl z-[1000]">
         <div className="logo flex gap-2 items-center text-primary">
-          <Origami className="md:size-6 lg:size-8" />
-          <p className="font-semibold">Question Paper Hub</p>
+          <Origami className="size-8 md:size-6 lg:size-8" />
+          <p className="hidden sm:block font-semibold">Question Paper Hub</p>
         </div>
         {/* <div className="flex gap-4 items-center font-medium justify-center text-black dark:text-[#A8B3CF]">
           <Link href={"/"} className="ladingNavLink">
