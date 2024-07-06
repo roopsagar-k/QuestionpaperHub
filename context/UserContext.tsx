@@ -1,6 +1,7 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { User, UserContextType } from "@/app/types/types";
+import axios from "@/axiosConfig";
 
 export const UserProviderContext = createContext<UserContextType | undefined>(
   undefined
@@ -8,6 +9,23 @@ export const UserProviderContext = createContext<UserContextType | undefined>(
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    async function checkAuthenticated() {
+      if (!user) {
+        try {
+          const response = await axios.get("/api/admin");
+          if (response.status === 200) {
+            console.log("user dta: ", response.data);
+            setUser(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    }
+    checkAuthenticated();
+  })
 
   return (
     <UserProviderContext.Provider value={{ user, setUser }}>

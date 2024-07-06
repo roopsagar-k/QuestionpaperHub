@@ -1,14 +1,36 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader } from "./ui/card";
 import Link from "next/link";
 import { Library, LibraryBig, Plus } from "lucide-react";
 import classNames from "classnames";
 import DrawerTest from "./DrawerTest";
 import { usePathname } from "next/navigation";
+import { useUserContext } from "@/context/UserContext";
+import axiosInstance from "@/axiosConfig";
 
 const PhoneViewPannel = () => {
   const [active, setActive] = useState("");
   const pathname = usePathname();
+  const { user, setUser } = useUserContext();
+
+  useEffect(() => {
+    async function checkAuthenticated() {
+      if (!user) {
+        try {
+          const response = await axiosInstance.get("/api/admin");
+          if (response.status === 200) {
+            console.log("user dta: ", response.data);
+            setUser(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    }
+    checkAuthenticated();
+  });
+
   return (
     <Card className="fixed bottom-0 left-0 right-0 z-50 mt-4">
       <CardDescription className="flex justify-between items-center h-full mx-2 text-gray-700 dark:text-[#A8B3CF]">
@@ -104,7 +126,8 @@ const PhoneViewPannel = () => {
             "flex flex-col flex-1 py-4 justify-center items-center",
             {
               "text-primary": active === "dashboard",
-              "border-t-2 border-primary text-primary": pathname === "/dashboard",
+              "border-t-2 border-primary text-primary":
+                pathname === "/dashboard",
             }
           )}
         >
