@@ -29,6 +29,7 @@ const Dashboard = () => {
     async function fetchTestsTaken() {
       const response = await axios.get("api/tests-taken");
       const { testsTaken }: { testsTaken: UserTestTakenType[] } = response.data;
+      console.log("records : ", testsTaken);
       setTakenTests(testsTaken);
     }
     fetchTestsTaken();

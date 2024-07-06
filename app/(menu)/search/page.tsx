@@ -26,7 +26,7 @@ const Search = () => {
     if (searchQuery) {
       fetchQueryResults();
     }
-  }, [searchQuery, encodedQuery]);
+  }, []);
 
   return (
     <div className="container mx-auto max-w-md p-3 sm:p-6 md:p-8 lg:p-10 xl:p-12 flex flex-col items-center gap-8">

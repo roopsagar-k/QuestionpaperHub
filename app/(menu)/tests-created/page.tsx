@@ -35,6 +35,7 @@ const TestsCreated = () => {
   useEffect(() => {
     async function fetchData() {
       const response = await axios.get("/api/tests");
+      console.log("my qps : ", response?.data);
       setTests(response?.data);
     }
     fetchData();
