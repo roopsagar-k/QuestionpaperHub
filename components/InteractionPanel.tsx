@@ -4,7 +4,7 @@ import { addToBookMark } from "@/lib/actions";
 import { removeBookMark } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { Post, Vote, UserVoteType } from "@/app/types/types";
-import axios from "@/axiosConfig";
+import axios from "axios";
 import CopyLinkComponent from "./CopyLinkComponent";
 import { usePathname } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";

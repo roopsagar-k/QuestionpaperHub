@@ -8,7 +8,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import { Test } from "@/app/types/types";
-import axios from "@/axiosConfig";
+import axios from "axios";
 import AuthModal from "./AuthModal";
 import Register from "./Register";
 import Login from "./Login";
@@ -124,7 +123,9 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
       formData.append("data", JSON.stringify(data));
       try {
         setIsLoading(true);
+        console.log("REACHED BEFORE AXIOS");
         const response = await axios.post("api/tests/file", formData);
+        console.log("REACHED AFTER AXIOS");
         testId = response.data.testId;
         console.log("respnse 201 chekc", response);
         if (response.status === 201) {

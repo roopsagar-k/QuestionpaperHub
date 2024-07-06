@@ -13,7 +13,7 @@ export const POST = auth(async function POST(req) {
   if (req.auth) {
     id = req.auth?.user?.id!;
   }
-
+console.log("reached here........");
   function fileToGenerativePart(buffer: ArrayBuffer, mimeType: string) {  
     return {
       inlineData: {

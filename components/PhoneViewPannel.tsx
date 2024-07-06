@@ -13,7 +13,6 @@ const PhoneViewPannel = () => {
   const [active, setActive] = useState("");
   const pathname = usePathname();
   const { user, setUser } = useUserContext();
-
   useEffect(() => {
     async function checkAuthenticated() {
       if (!user) {
