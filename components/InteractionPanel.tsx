@@ -33,7 +33,7 @@ const InteractionPanel: React.FC<InteractionPanelProps> = ({
   const { user } = useUserContext();
   const [isBookMark, setIsBookMark] = useState<boolean>(false);
   const pathName = usePathname();
-  let link = process.env.BASE_URL || "http://localhost:3000";
+  let link = process.env.BASE_URL || "https://questionpaper-hub.vercel.app/";
   link += "/home/post/" + post?.tests.id;
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -51,7 +51,7 @@ const InteractionPanel: React.FC<InteractionPanelProps> = ({
       }
     }
     fetchBookMarks();
-  }, [pathName, post?.tests?.id]);
+  }, []);
 
   const updateBookMark = async () => {
     if (isBookMark) {

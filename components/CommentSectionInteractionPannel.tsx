@@ -145,10 +145,11 @@ const CommentSectionInteractionPannel: React.FC<Props> = ({
 
   const pathname = usePathname();
   const link =
-    process.env.BASE_URL || "http://localhost:3000" +
-    pathname +
-    "#comment-" +
-    (nested ? nestedCommentId : id);
+    process.env.BASE_URL ||
+    "https://questionpaper-hub.vercel.app/" +
+      pathname +
+      "#comment-" +
+      (nested ? nestedCommentId : id);
 
   return (
     <>
