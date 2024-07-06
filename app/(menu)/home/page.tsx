@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from "@/axiosConfig";
+import axios from "axios";
 import type { Post as PostType } from "../../types/types";
 import Post from "@/components/Post";
 

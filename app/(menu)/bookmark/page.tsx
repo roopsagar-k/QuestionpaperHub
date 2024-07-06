@@ -3,7 +3,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useUserContext } from "@/context/UserContext";
 import type { BookMarkJoinType, Post as PostType } from "../../types/types";
 import Post from "@/components/Post";
-import axios from "@/axiosConfig";
+import axios from "axios";
 
 
 const BookMark = () => {

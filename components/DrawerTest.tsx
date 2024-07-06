@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import { Test } from "@/app/types/types";
-import axios from "@/axiosConfig";
+import axios from "axios";
 import AuthModal from "./AuthModal";
 import Register from "./Register";
 import Login from "./Login";
