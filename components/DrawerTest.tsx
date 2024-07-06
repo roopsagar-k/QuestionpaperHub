@@ -113,7 +113,7 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
       privatePost: privatePost,
     };
     let testId = "";
-    if (file) {
+    if (file && !ownTest) {
       const formData = new FormData();
       const blob = new Blob([text], { type: "text/plain" });
       const file = new File([blob], "converted-text.txt", {
