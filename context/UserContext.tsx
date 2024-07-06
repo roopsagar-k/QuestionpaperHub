@@ -25,7 +25,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
     }
     checkAuthenticated();
-  })
+  }, [])
 
   return (
     <UserProviderContext.Provider value={{ user, setUser }}>
