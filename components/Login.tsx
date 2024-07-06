@@ -22,7 +22,6 @@ interface LoginProps {
   setIsLogin?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
 const Login: React.FC<LoginProps> = ({ setIsLogin }) => {
   const router = useRouter();
   const { theme } = useTheme();
@@ -45,8 +44,10 @@ const Login: React.FC<LoginProps> = ({ setIsLogin }) => {
       setPassword("");
       setError("");
     } catch (error) {
-      if (error instanceof AuthError)
+      if (error instanceof AuthError) {
+        setIsLoading(false);
         setError(error.message.split(".")[0].trim());
+      }
       throw error;
     }
   };
@@ -63,9 +64,11 @@ const Login: React.FC<LoginProps> = ({ setIsLogin }) => {
           <Button
             variant={"outline"}
             name="google"
-            onClick={() => signIn("discord", {
+            onClick={() =>
+              signIn("discord", {
                 callbackUrl: `${setIsLogin === undefined ? "/home" : pathname}`,
-              })}
+              })
+            }
             className="w-full sm:w-1/2 flex items-center justify-center shadow-sm text-black hover:text-primary dark:text-white dark:hover:text-primary"
           >
             <svg
@@ -102,9 +105,11 @@ const Login: React.FC<LoginProps> = ({ setIsLogin }) => {
           <Button
             variant={"outline"}
             name="google"
-            onClick={() => signIn("google", {
+            onClick={() =>
+              signIn("google", {
                 callbackUrl: `${setIsLogin === undefined ? "/home" : pathname}`,
-              })}
+              })
+            }
             className="w-full sm:w-1/2 flex items-center justify-center shadow-sm text-black hover:text-primary dark:text-white dark:hover:text-primary"
           >
             <svg

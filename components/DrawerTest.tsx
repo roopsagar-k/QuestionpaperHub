@@ -29,8 +29,9 @@ import Login from "./Login";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import pdfToImages from "@/lib/pdfToImage";
 import { useUserContext } from "@/context/UserContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, Scroll } from "lucide-react";
 import { createWorker } from "tesseract.js";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   const router = useRouter();
@@ -48,7 +49,6 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   const [arrayOfObjects, setArrayOfObjects] = useState<any>([]);
 
   const workerRef = useRef<Tesseract.Worker | null>(null);
-
 
   useEffect(() => {
     async function worker() {
@@ -222,7 +222,7 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
         >
           {children}
         </div>
-        <DrawerContent className="sm:px-[10%] md:[15%] lg:px-[20%] max-h-[95%]">
+        <DrawerContent className="sm:px-[10%] md:[15%] lg:px-[20%] max-h-[95%] md:h-[100%]">
           <form onSubmit={(e) => handleSubmit(e)}>
             <DrawerHeader className="max-h-screen overflow-y-scroll">
               <DrawerTitle>Test creation</DrawerTitle>
@@ -233,120 +233,122 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
                 Create test by uploading PDF/Images or Add the questions and
                 options manually
               </DrawerDescription>
-              <div className="flex flex-col gap-2 h-full overflow-y-scroll">
-                <div className="grid grid-cols-2 gap-4">
-                  <Card className="flex flex-col gap-3 items-center text-justify sm:flex-row sm:items-start shadow-md sm:text-left p-3">
-                    <div>
-                      <CardTitle className="text-md">
-                        Compose Your Own Test
-                      </CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        Manually add questions, options, answers, and attach
-                        PDFs/images to create your own question paper.
-                      </CardDescription>
-                    </div>
-                    <Switch
-                      id="own-test"
-                      name="ownTest"
-                      checked={ownTest}
-                      value={ownTest ? "on" : "off"}
-                      onCheckedChange={() => setOwnTest(!ownTest)}
-                    />
-                  </Card>
-                  <Card className="flex flex-col gap-3 items-center text-justify shadow-md sm:flex-row sm:items-start sm:text-left p-3">
-                    <div>
-                      <CardTitle className=" text-md">Private post</CardTitle>
-                      <CardDescription className="text-xs">
-                        By checking this, your post or test will be visible only
-                        to those who access them via links, not even to your
-                        followers.
-                      </CardDescription>
-                    </div>
-                    <Switch
-                      id="private-post"
-                      name="privatePost"
-                      value={privatePost ? "on" : "off"}
-                      checked={privatePost}
-                      onCheckedChange={() => setPrivatePost(!privatePost)}
-                    />
-                  </Card>
-                </div>
-                <Card className="flex items-center justify-center shadow-md relative">
-                  <CardContent className="flex flex-col items-center justify-center mt-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-12 h-12"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
-                        clipRule="evenodd"
+              <ScrollArea className="h-[550px] mb-0">
+                <div className="flex flex-col gap-2 h-full overflow-y-scroll">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="flex flex-col gap-3 items-center text-justify sm:flex-row sm:items-start shadow-md sm:text-left p-3">
+                      <div>
+                        <CardTitle className="text-md">
+                          Compose Your Own Test
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
+                          Manually add questions, options, answers, and attach
+                          PDFs/images to create your own question paper.
+                        </CardDescription>
+                      </div>
+                      <Switch
+                        id="own-test"
+                        name="ownTest"
+                        checked={ownTest}
+                        value={ownTest ? "on" : "off"}
+                        onCheckedChange={() => setOwnTest(!ownTest)}
                       />
-                    </svg>
-                    <CardDescription className="text-primary">
-                      <p>Choose PDF/images or drag and drop</p>
-                      <p className="text-center text-white  underline">
-                        {file ? file.name : ""}
-                      </p>
-                    </CardDescription>
-                  </CardContent>
-                  <Input
-                    className="w-full h-full absolute opacity-0"
-                    id="file"
-                    name="file"
-                    onChange={(e) => onFileChange(e)}
-                    multiple={true}
-                    type="file"
-                    required={!ownTest}
-                    disabled={ownTest}
-                    accept="image/*, application/pdf"
-                  />
-                </Card>
-                <div className="flex mt-4 gap-4">
-                  <div className="flex flex-col w-full gap-2">
-                    <Label htmlFor="title">Title</Label>
+                    </Card>
+                    <Card className="flex flex-col gap-3 items-center text-justify shadow-md sm:flex-row sm:items-start sm:text-left p-3">
+                      <div>
+                        <CardTitle className=" text-md">Private post</CardTitle>
+                        <CardDescription className="text-xs">
+                          By checking this, your post or test will be visible
+                          only to those who access them via links, not even to
+                          your followers.
+                        </CardDescription>
+                      </div>
+                      <Switch
+                        id="private-post"
+                        name="privatePost"
+                        value={privatePost ? "on" : "off"}
+                        checked={privatePost}
+                        onCheckedChange={() => setPrivatePost(!privatePost)}
+                      />
+                    </Card>
+                  </div>
+                  <Card className="flex items-center justify-center shadow-md relative">
+                    <CardContent className="flex flex-col items-center justify-center mt-4">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="w-12 h-12"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <CardDescription className="text-primary">
+                        <p>Choose PDF/images or drag and drop</p>
+                        <p className="text-center text-white  underline">
+                          {file ? file.name : ""}
+                        </p>
+                      </CardDescription>
+                    </CardContent>
                     <Input
-                      id="title"
-                      name="title"
-                      placeholder="Title"
+                      className="w-full h-full absolute opacity-0"
+                      id="file"
+                      name="file"
+                      onChange={(e) => onFileChange(e)}
+                      multiple={true}
+                      type="file"
+                      required={!ownTest}
+                      disabled={ownTest}
+                      accept="image/*, application/pdf"
+                    />
+                  </Card>
+                  <div className="flex mt-4 gap-4">
+                    <div className="flex flex-col w-full gap-2">
+                      <Label htmlFor="title">Title</Label>
+                      <Input
+                        id="title"
+                        name="title"
+                        placeholder="Title"
+                        type="text"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col w-full gap-2">
+                      <Label htmlFor="title">Duration in mins</Label>
+                      <Input
+                        id="duration"
+                        name="duration"
+                        type="number"
+                        placeholder="Enter the test duration in minutes"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col mt-4 gap-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      typeof="text"
+                      id="description"
+                      name="description"
+                      placeholder="Share your thoughts about this post..."
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col mt-4 gap-2">
+                    <Label htmlFor="tags">Tags</Label>
+                    <Input
+                      id="tags"
+                      name="tags"
                       type="text"
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col w-full gap-2">
-                    <Label htmlFor="title">Duration in mins</Label>
-                    <Input
-                      id="duration"
-                      name="duration"
-                      type="number"
-                      placeholder="Enter the test duration in minutes"
+                      placeholder="Add relevant tags (comma-separated)"
                       required
                     />
                   </div>
                 </div>
-                <div className="flex flex-col mt-4 gap-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    typeof="text"
-                    id="description"
-                    name="description"
-                    placeholder="Share your thoughts about this post..."
-                    required
-                  />
-                </div>
-                <div className="flex flex-col mt-4 gap-2">
-                  <Label htmlFor="tags">Tags</Label>
-                  <Input
-                    id="tags"
-                    name="tags"
-                    type="text"
-                    placeholder="Add relevant tags (comma-separated)"
-                    required
-                  />
-                </div>
-              </div>
+              </ScrollArea>
             </DrawerHeader>
             <DrawerFooter>
               <Button disabled={isProcessing || isLoading} type="submit">
