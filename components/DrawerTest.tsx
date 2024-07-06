@@ -128,6 +128,9 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
         console.log("REACHED AFTER AXIOS");
         testId = response.data.testId;
         console.log("respnse 201 chekc", response);
+        if(response.data.error) {
+          console.log(response.data.error)
+        }
         if (response.status === 201) {
           setIsLoading(false);
           router.push(`/create-paper/${testId}`);

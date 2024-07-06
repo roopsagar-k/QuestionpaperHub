@@ -3,17 +3,13 @@ import { TestTable } from "@/lib/drizzle/schema";
 import { Test } from "@/app/types/types";
 import { auth } from "@/auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from "fs-extra";
-import path from "path";
-import { pipeline } from "stream";
-import { promisify } from "util";
 
 export const POST = auth(async function POST(req) {
   let id: string = "";
   if (req.auth) {
     id = req.auth?.user?.id!;
   }
-console.log("reached here........");
+  
   function fileToGenerativePart(buffer: ArrayBuffer, mimeType: string) {  
     return {
       inlineData: {
@@ -32,14 +28,6 @@ console.log("reached here........");
     if (typeof dataString === "string") {
       const data: Test = JSON.parse(dataString);
 
-      // Save file
-      const pipelineAsync = promisify(pipeline);
-      const uploadsDir = path.join(process.cwd(), "uploads");
-      await fs.ensureDir(uploadsDir);
-      const filePath = path.join(uploadsDir, textFile.name);
-      console.log("filePath: ", filePath);
-      await pipelineAsync(textFile.stream() as any, fs.createWriteStream(filePath));
-
 
       // Create google file manager
 
@@ -47,8 +35,7 @@ console.log("reached here........");
         process.env.GEMINI_API_KEY as string
       );
 
-      await fs.promises.unlink(filePath);
-      console.log("Deleted file: ", filePath);
+     
       try {
 
         const model = genAI.getGenerativeModel({
