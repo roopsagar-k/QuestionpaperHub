@@ -16,7 +16,8 @@ const Home = () => {
     fetchData();
   }, []);
   return (
-    <div className="container whitespace-pre-wrap mx-auto max-w-md p-3 sm:p-6 md:p-8 lg:p-10 xl:p-12 flex flex-col items-center gap-8">
+    <div className="container whitespace-pre-wrap mx-auto max-w-md p-3 sm:p-6 md:p-8 lg:p-10 xl:p-12 flex flex-col-reverse items-center gap-8">
+      <div className="h-16"></div>
       {posts?.length > 0 &&
         posts?.map((post) => (
           <Post
@@ -26,7 +27,6 @@ const Home = () => {
             descriptionLength={"half"}
           />
         ))}
-      <div className="h-16"></div>
     </div>
   );
 };
