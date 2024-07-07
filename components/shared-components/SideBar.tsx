@@ -188,14 +188,14 @@ const SideBar = () => {
         >
           <span>
             {expanded && (
-              <div className="flex gap-2 items-center text-primary">
+              <Link href={"/"} className="flex gap-2 items-center text-primary">
                 <Origami className="w-6 h-6" />
                 <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
                   <p className="font-bold text-xl animate-in animate-out">
-                    Question Paper Hub
+                    Questionpaper Hub
                   </p>
                 </div>
-              </div>
+              </Link>
             )}
           </span>
           {view !== "tablet" && (

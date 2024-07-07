@@ -63,7 +63,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   }
 
   return (
-    <Card className="relative flex flex-col gap-8 w-full md:min-w-[30rem] lg:min-w-[40rem] xl:min-w-[55rem]">
+    <Card className="relative flex flex-col gap-8 w-full md:min-w-[30rem] lg:min-w-[40rem] xl:min-w-auto">
       {comments.map((comment) => (
         <div key={comment.comments.id}>
           <Card

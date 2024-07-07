@@ -1,10 +1,12 @@
-import React from "react";
+"use client";
+import React, { useRef } from "react";
 import LandingNav from "@/components/shared-components/LandingNav";
 import { Button } from "@/components/ui/button";
 import AuthModal from "@/components/auth/AuthModal";
 import { HoverEffect } from "./ui/card-hover-effect";
 import { FlipWords } from "./ui/flip-words";
 import Footer from "./shared-components/Footer";
+import { useRouter } from "next/navigation";
 
 interface LadingPageProps {
   children?: React.ReactNode;
@@ -13,6 +15,8 @@ interface LadingPageProps {
 }
 
 const LandingPage = ({ children, open, setOpen }: LadingPageProps) => {
+  const router = useRouter();
+  const knowMoreRef = useRef<HTMLElement>(null);
   const features = [
     {
       title: "AI-Powered PDF/Images Integration",
@@ -73,9 +77,9 @@ const LandingPage = ({ children, open, setOpen }: LadingPageProps) => {
           <p>Effortlessly create, share, and take tests.</p>
           <FlipWords words={words} />. All in one seamless platform!
         </h4>
-        <div className="flex gap-4 mt-4 z-50">
-          <Button variant="secondary">Check</Button>
-          <Button>Get started</Button>
+        <div className="flex gap-4 mt-4 z-50 font-semibold">
+          <Button  onClick={() => knowMoreRef?.current?.scrollIntoView({ behavior: "smooth" })} variant="secondary">Know more</Button>
+          <Button onClick={() => router.push("/home")}  >Get started</Button>
         </div>
       </div>
       {/* <section
@@ -88,7 +92,7 @@ const LandingPage = ({ children, open, setOpen }: LadingPageProps) => {
           alt="hero-section-image"
         />
       </section> */}
-      <section className="w-[85%] md:w-[45rem] xl:w-[75rem] z-[50] mt-1 lg:mt-20">
+      <section ref={knowMoreRef} id="know-more" className="w-[85%] md:w-[45rem] xl:w-[75rem] z-[50] mt-1 lg:mt-20">
         <div className="bg-gradient-to-r py-2 from-primary to-secondary-foreground text-transparent bg-clip-text relative z-50">
           <h3 className="text-2xl sm:text-3xl font-bold text-center md:text-4xl xl:text-6xl">
             Platform Highlights
