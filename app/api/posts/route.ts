@@ -1,9 +1,9 @@
 import { db } from "@/lib/drizzle/db";
 import { TestTable, UserTable } from "@/lib/drizzle/schema";
 import { eq } from "drizzle-orm";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  console.log("hoi")
   const tests = await db
     .select()
     .from(TestTable)
