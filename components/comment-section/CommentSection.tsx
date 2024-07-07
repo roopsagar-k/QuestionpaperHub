@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import type { Comment } from "@/app/types/types";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import CommentSectionInteractionPannel from "./CommentSectionInteractionPannel";
+import CommentSectionInteractionPannel from "../Pannels/CommentSectionInteractionPannel";
 import CommentTextBox from "./CommentTextBox";
 import { useUserContext } from "@/context/UserContext";
 import axios from "axios";

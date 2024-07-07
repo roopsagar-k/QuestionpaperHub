@@ -1,10 +1,10 @@
 import React from "react";
-import LandingNav from "@/components/LandingNav";
+import LandingNav from "@/components/shared-components/LandingNav";
 import { Button } from "@/components/ui/button";
-import AuthModal from "@/components/AuthModal";
+import AuthModal from "@/components/auth/AuthModal";
 import { HoverEffect } from "./ui/card-hover-effect";
 import { FlipWords } from "./ui/flip-words";
-import Footer from "./Footer";
+import Footer from "./shared-components/Footer";
 
 interface LadingPageProps {
   children?: React.ReactNode;
@@ -13,45 +13,45 @@ interface LadingPageProps {
 }
 
 const LandingPage = ({ children, open, setOpen }: LadingPageProps) => {
- const features = [
-   {
-     title: "AI-Powered PDF/Images Integration",
-     description:
-       "Easily convert your PDFs/Images into question papers or create them manually. Perfect for tailored content creation!",
-     link: "#",
-   },
-   {
-     title: "Create & Share Question Papers",
-     description:
-       "Design and share your own question papers. Make them public for everyone or keep them private for personal use.",
-     link: "#",
-   },
-   {
-     title: "Interactive Testing & Score Tracking",
-     description:
-       "Take tests instantly, track your scores, and retake to improve. Keep learning and see your progress!",
-     link: "#",
-   },
-   {
-     title: "Edit & Retake Anytime",
-     description:
-       "Edit your question papers anytime and retake tests to boost your scores. Keep refining your knowledge!",
-     link: "#",
-   },
-   {
-     title: "Bookmark & Engage",
-     description:
-       "Bookmark question papers for later and join the interactive comment section. Like, dislike, and share posts and comments!",
-     link: "#",
-   },
- ];
+  const features = [
+    {
+      title: "AI-Powered PDF/Images Integration",
+      description:
+        "Easily convert your PDFs/Images into question papers or create them manually. Perfect for tailored content creation!",
+      link: "#",
+    },
+    {
+      title: "Create & Share Question Papers",
+      description:
+        "Design and share your own question papers. Make them public for everyone or keep them private for personal use.",
+      link: "#",
+    },
+    {
+      title: "Interactive Testing & Score Tracking",
+      description:
+        "Take tests instantly, track your scores, and retake to improve. Keep learning and see your progress!",
+      link: "#",
+    },
+    {
+      title: "Edit & Retake Anytime",
+      description:
+        "Edit your question papers anytime and retake tests to boost your scores. Keep refining your knowledge!",
+      link: "#",
+    },
+    {
+      title: "Bookmark & Engage",
+      description:
+        "Bookmark question papers for later and join the interactive comment section. Like, dislike, and share posts and comments!",
+      link: "#",
+    },
+  ];
 
- const words = [
-   "Upload PDFs/Images",
-   "Design Your Own",
-   "Track Your Progress",
-   "Engage-in-Discussions",
- ];
+  const words = [
+    "Upload PDFs/Images",
+    "Design Your Own",
+    "Track Your Progress",
+    "Engage-in-Discussions",
+  ];
 
   return (
     <main className="h-auto w-full relative flex flex-col items-center justify-start">

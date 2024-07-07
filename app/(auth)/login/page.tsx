@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Login from "@/components/Login";
+import Login from "@/components/auth/Login";
 import LandingPage from "@/components/LandingPage";
 
 const LoginPage = () => {

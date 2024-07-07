@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Textarea } from "./ui/textarea";
-import { Button } from "./ui/button";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import classNames from "classnames";
 import { useUserContext } from "@/context/UserContext";
-import AuthModal from "./AuthModal";
-import Register from "./Register";
-import Login from "./Login";
+import AuthModal from "../auth/AuthModal";
+import Register from "../auth/Register";
+import Login from "../auth/Login";
 
 interface CommentTextBoxProps {
   showTextArea: boolean;
@@ -68,7 +68,9 @@ const CommentTextBox: React.FC<CommentTextBoxProps> = ({
             <Button
               disabled={comment?.trim().length === 0}
               className="w-full h-12 mt-4 rounded-md"
-              onClick={(e) => user ? handleClick(e, recipientId) : setOpenLoginDialog(true)}
+              onClick={(e) =>
+                user ? handleClick(e, recipientId) : setOpenLoginDialog(true)
+              }
             >
               Comment
             </Button>

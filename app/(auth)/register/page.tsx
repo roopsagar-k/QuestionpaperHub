@@ -1,5 +1,5 @@
 "use client";
-import Register from "@/components/Register";
+import Register from "@/components/auth/Register";
 import React, { useState } from "react";
 import LandingPage from "@/components/LandingPage";
 

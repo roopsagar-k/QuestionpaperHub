@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Input } from "./ui/input";
+import { Input } from "../ui/input";
 import { LogOut, Mail, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

@@ -38,7 +38,7 @@ const Comment: React.FC<CommentProps> = ({
   return (
     <>
       <Card
-        onClick={() =>  setShowTextArea(true)}
+        onClick={() => setShowTextArea(true)}
         className={classNames(
           "bg-secondary md:min-w-[30rem] lg:min-w-[40rem] xl:min-w-[55rem] hover:border hover:border-gray-200 cursor-pointer p-2 flex justify-between items-center",
           showTextArea && "hidden"

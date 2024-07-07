@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader } from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "../ui/card";
 import Link from "next/link";
 import { Library, LibraryBig, Plus } from "lucide-react";
 import classNames from "classnames";
-import DrawerTest from "./DrawerTest";
+import DrawerTest from "../shared-components/DrawerTest";
 import { usePathname } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 import axiosInstance from "@/axiosConfig";

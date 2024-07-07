@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { PanelRightClose } from "lucide-react";
 import { User } from "lucide-react";
-import ToolTip from "./ToolTip";
+import ToolTip from "../ToolTip";
 import axios from "axios";
 import { useUserContext } from "@/context/UserContext";
 import { Origami } from "lucide-react";

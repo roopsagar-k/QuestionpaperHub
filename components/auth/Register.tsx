@@ -9,12 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 import axios from "axios";
-import Otp from "./Otp";
+import Otp from "../Otp";
 import { sendOtp } from "@/lib/actions";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";

@@ -9,18 +9,18 @@ import type {
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Button } from "@/components/ui/button";
-import InteractionPanel from "@/components/InteractionPanel";
+import InteractionPanel from "@/components/Pannels/InteractionPanel";
 import PaperViewDialog from "@/components/PaperViewDialog";
-import Comment from "@/components/Comment";
-import CommentSection from "@/components/CommentSection";
+import Comment from "@/components/comment-section/Comment";
+import CommentSection from "@/components/comment-section/CommentSection";
 import { Tag } from "lucide-react";
 import type { UserVoteType } from "@/app/types/types";
 import { formatDistanceToNow } from "date-fns";
 import { useMediaQuery } from "react-responsive";
 import { useUserContext } from "@/context/UserContext";
-import AuthModal from "@/components/AuthModal";
-import Register from "./Register";
-import Login from "./Login";
+import AuthModal from "@/components/auth/AuthModal";
+import Register from "./auth/Register";
+import Login from "./auth/Login";
 
 interface PostComponentProps {
   post: PostType;

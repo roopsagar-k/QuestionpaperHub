@@ -5,13 +5,13 @@ import { removeBookMark } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { Post, Vote, UserVoteType } from "@/app/types/types";
 import axios from "axios";
-import CopyLinkComponent from "./CopyLinkComponent";
+import CopyLinkComponent from "../CopyLinkComponent";
 import { usePathname } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
-import Login from "./Login";
+import Login from "../auth/Login";
 import { Dialog } from "@/components/ui/dialog";
-import AuthModal from "./AuthModal";
-import Register from "./Register";
+import AuthModal from "../auth/AuthModal";
+import Register from "../auth/Register";
 import { useMediaQuery } from "react-responsive";
 
 interface InteractionPanelProps {

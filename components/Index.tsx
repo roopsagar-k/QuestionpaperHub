@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import SideBar from "@/components/SideBar";
-import HomePageNav from "@/components/HomePageNav";
+import SideBar from "@/components/shared-components/SideBar";
+import HomePageNav from "@/components/shared-components/HomePageNav";
 import { Separator } from "@/components/ui/separator";
-import DrawerTest from "@/components/DrawerTest";
+import DrawerTest from "@/components/shared-components/DrawerTest";
 import ToolTip from "./ToolTip";
 
 const Index = ({ children }: { children: React.ReactNode }) => {

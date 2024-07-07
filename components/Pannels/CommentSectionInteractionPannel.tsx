@@ -14,15 +14,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "./ui/textarea";
+import { Textarea } from "../ui/textarea";
 import axios from "@/axiosConfig";
-import CopyLinkComponent from "./CopyLinkComponent";
+import CopyLinkComponent from "../CopyLinkComponent";
 import { usePathname } from "next/navigation";
-import AuthModal from "./AuthModal";
-import Register from "./Register";
-import Login from "./Login";
+import AuthModal from "../auth/AuthModal";
+import Register from "../auth/Register";
+import Login from "../auth/Login";
 import { useUserContext } from "@/context/UserContext";
 
 interface Props {
