@@ -222,20 +222,20 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
         >
           {children}
         </div>
-        <DrawerContent className="sm:px-[10%] md:[15%] lg:px-[20%] max-h-[95%] md:h-[100%]">
+        <DrawerContent className="sm:px-[10%] md:px-[15%] lg:px-[20%]">
           <form onSubmit={(e) => handleSubmit(e)}>
-            <DrawerHeader className="max-h-screen overflow-y-scroll">
-              <DrawerTitle>Test creation</DrawerTitle>
-              <DrawerDescription>
-                <p className="text-destructive">
-                  {errorMessage && errorMessage}
-                </p>
-                Create test by uploading PDF/Images or Add the questions and
-                options manually
-              </DrawerDescription>
-              <ScrollArea className="h-[550px] mb-0">
-                <div className="flex flex-col gap-2 h-full overflow-y-scroll">
-                  <div className="grid grid-cols-2 gap-4">
+            <ScrollArea type="scroll" className={`${openDrawer && "max-h-[97vh] overflow-auto md:max-h-auto"}`}>
+              <DrawerHeader>
+                <DrawerTitle>Test creation</DrawerTitle>
+                <DrawerDescription>
+                  <p className="text-destructive">
+                    {errorMessage && errorMessage}
+                  </p>
+                  Create test by uploading PDF/Images or Add the questions and
+                  options manually
+                </DrawerDescription>
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card className="flex flex-col gap-3 items-center text-justify sm:flex-row sm:items-start shadow-md sm:text-left p-3">
                       <div>
                         <CardTitle className="text-md">
@@ -331,6 +331,7 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
                     <Label htmlFor="description">Description</Label>
                     <Textarea
                       typeof="text"
+                      className="min-h-32"
                       id="description"
                       name="description"
                       placeholder="Share your thoughts about this post..."
@@ -348,36 +349,36 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
                     />
                   </div>
                 </div>
-              </ScrollArea>
-            </DrawerHeader>
-            <DrawerFooter>
-              <Button disabled={isProcessing || isLoading} type="submit">
-                {isProcessing && (
-                  <div className="flex gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>
-                      Performing OCR on your document. Sit tight, this might
-                      take a moment...
-                    </span>
-                  </div>
-                )}
-                {isLoading ? (
-                  <div className="flex gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>
-                      Hang tight! Gemini AI is working its magic ✨
-                    </span>{" "}
-                  </div>
-                ) : (
-                  !isProcessing && <span>Submit</span>
-                )}
-              </Button>
-              <DrawerClose>
-                <Button variant="outline" className="w-full" type="button">
-                  Cancel
+              </DrawerHeader>
+              <DrawerFooter>
+                <Button disabled={isProcessing || isLoading} type="submit">
+                  {isProcessing && (
+                    <div className="flex gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>
+                        Performing OCR on your document. Sit tight, this might
+                        take a moment...
+                      </span>
+                    </div>
+                  )}
+                  {isLoading ? (
+                    <div className="flex gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>
+                        Hang tight! Gemini AI is working its magic ✨
+                      </span>{" "}
+                    </div>
+                  ) : (
+                    !isProcessing && <span>Submit</span>
+                  )}
                 </Button>
-              </DrawerClose>
-            </DrawerFooter>
+                <DrawerClose>
+                  <Button variant="outline" className="w-full" type="button">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </ScrollArea>
           </form>
         </DrawerContent>
       </Drawer>
