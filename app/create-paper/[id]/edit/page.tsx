@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import type { Test } from "@/app/types/types";
+import type { Test, cloudinaryImagObj } from "@/app/types/types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,7 +31,7 @@ const EditPage = () => {
     fetchData();
   }, [id]);
 
-  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [deletedImages, setDeletedImages] = useState<cloudinaryImagObj[]>([]);
 
   const handleSaveChanges = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
