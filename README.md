@@ -1,5 +1,5 @@
 # Question Paper Hub - Comprehensive Question Paper Management App
-[![R](https://img.shields.io/badge/%20FIGMA%20DESIGN-blue?style=for-the-badge)](https://questionpaper-hub.vercel.app/)
+[![R](https://img.shields.io/badge/%20WEB%20LINK-blue?style=for-the-badge)](https://questionpaper-hub.vercel.app/)
 ## Overview
 
 This app, built using ShadCN, Next.js, and TypeScript, enables students and users to upload PDFs or manually create question papers. Key features include text extraction with LLM integration, interactive posts (public/private), upvotes/downvotes, comments for discussion, and instant test-taking based on uploaded papers.
