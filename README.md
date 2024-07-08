@@ -21,22 +21,22 @@ This app, built using ShadCN, Next.js, and TypeScript, enables students and user
 
 ## Tech Stack
 
-**Framework:** Next.js
-**Styling:** ShadCN, Acertinity and tailwind
-**Language:** TypeScript
-**Database:** PostgreSQL with Drizzle ORM
-**Authentication:** Auth.js
+- **Framework:** Next.js
+- **Styling:** ShadCN, Acertinity and tailwind
+- **Language:** TypeScript
+- **Database:** PostgreSQL with Drizzle ORM
+- **Authentication:** Auth.js
 
 ## Usage
 This app allows users to:
 
-Upload PDFs or create question papers manually.
-Extract text from uploaded PDFs using LLM integration.
-Create interactive posts that can be set as public or private.
-Engage with posts through upvotes, downvotes, and comments.
-Take tests instantly based on the uploaded question papers.
-Access and take tests for any publicly available question paper posts.
-Track the marks scored for each test taken.
+- Upload PDFs or create question papers manually.
+- Extract text from uploaded PDFs using LLM integration.
+- Create interactive posts that can be set as public or private.
+- Engage with posts through upvotes, downvotes, and comments.
+- Take tests instantly based on the uploaded question papers.
+- Access and take tests for any publicly available question paper posts.
+- Track the marks scored for each test taken.
 
 
 
