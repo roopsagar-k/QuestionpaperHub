@@ -36,7 +36,6 @@ This app allows users to:
 ### Extract text from uploaded PDFs using LLM integration.
 ### Create interactive posts that can be set as public or private.
   ![image](https://github.com/roopsagar-k/QuestionpaperHub/blob/master/public/drawer.png)
-  ![image](https://github.com/roopsagar-k/QuestionpaperHub/blob/master/public/drawer-light.png)
 ### Engage with posts through upvotes, downvotes, and comments.
   ![image](https://github.com/roopsagar-k/QuestionpaperHub/blob/master/public/homePage.png)
 ### Take tests instantly based on the uploaded question papers.
