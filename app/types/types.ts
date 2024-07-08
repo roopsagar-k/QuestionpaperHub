@@ -41,7 +41,7 @@ export type QuestionType = {
   question: string;
   options: { option: string }[];
   answer: string;
-  images?: string[];
+  images?: { url: string; publicId: string }[];
 };
 
 export type TestInfo = {
@@ -133,4 +133,9 @@ export type BookMarkJoinType = {
 export type Answer = {
   answer: number,
   questionIndex: number,
+}
+
+export type cloudinaryImagObj = {
+  url: string;
+  publicId: string; 
 }

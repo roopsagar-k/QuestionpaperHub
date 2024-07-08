@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import type { QuestionType, Answer } from "@/app/types/types";
+import type { QuestionType, Answer, cloudinaryImagObj } from "@/app/types/types";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import classNames from "classnames";
@@ -23,8 +23,8 @@ const Questions = ({
 }: {
   questions: QuestionType[];
   setQuestions?: React.Dispatch<React.SetStateAction<QuestionType[]>>;
-  deletedImages?: string[];
-  setDeletedImages?: React.Dispatch<React.SetStateAction<string[]>>;
+  deletedImages?: cloudinaryImagObj[];
+  setDeletedImages?: React.Dispatch<React.SetStateAction<cloudinaryImagObj[]>>;
   readOnly?: boolean;
   answers?: Answer[];
   showAnswers?: boolean;
@@ -98,11 +98,11 @@ const Questions = ({
 
         setQuestions!((prev) => {
           const newArray = [...prev];
-          uploadedFiles.forEach((fileName: string) => {
+          uploadedFiles.forEach((file: cloudinaryImagObj) => {
             newArray[index].images
-              ? !newArray[index].images?.includes(fileName) &&
-                newArray[index].images?.push(fileName)
-              : (newArray[index]["images"] = [fileName]);
+              ? !newArray[index].images?.includes(file) &&
+                newArray[index].images?.push(file)
+              : (newArray[index]["images"] = [file]);
           });
           return newArray;
         });
@@ -141,11 +141,11 @@ const Questions = ({
               {question?.images?.length! > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-4 gap-1 overflow-hidden rounded-md">
                   {question?.images?.map((image, imageIndex) => (
-                    <div key={image} className="relative">
+                    <div key={image.url} className="relative">
                       <img
                         key={imageIndex}
-                        src={"/images/" + image}
-                        alt={image}
+                        src={image.url}
+                        alt={image.url}
                         className="object-cover w-full h-auto"
                       />
                       <div className={`${readOnly && "hidden size-0"}`}>

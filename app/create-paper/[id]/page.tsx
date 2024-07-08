@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Questions from "@/components/Questions";
-import type { QuestionType, Test } from "@/app/types/types";
+import type { QuestionType, Test, cloudinaryImagObj } from "@/app/types/types";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import axios from "axios";
@@ -13,7 +13,7 @@ const CreatePaper = () => {
   const { id: testId } = useParams();
   const { toast } = useToast();
   const router = useRouter();
-  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [deletedImages, setDeletedImages] = useState<cloudinaryImagObj[]>([]);
   const [warningText, setWarningText] = useState<string>("");
   const [questions, setQuestions] = useState<QuestionType[]>([
     {
