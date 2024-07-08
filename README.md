@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Question Paper Hub - Comprehensive Question Paper Management App
 
-## Getting Started
+## Overview
 
-First, run the development server:
+This app, built using ShadCN, Next.js, and TypeScript, enables students and users to upload PDFs or manually create question papers. Key features include text extraction with LLM integration, interactive posts (public/private), upvotes/downvotes, comments for discussion, and instant test-taking based on uploaded papers.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Table of Contents
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Features
+2. Tech Stack
+3. Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Upload PDFs or manually create question papers
+- Text extraction with LLM integration
+- Interactive posts (public/private)
+- Upvotes/downvotes
+- Comments for discussion
+- Instant test-taking based on uploaded papers
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** Next.js
+- **Styling:** ShadCN, Acertinity and tailwind
+- **Language:** TypeScript
+- **Database:** PostgreSQL with Drizzle ORM
+- **Authentication:** Auth.js
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
+This app allows users to:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- Upload PDFs or create question papers manually.
+- Extract text from uploaded PDFs using LLM integration.
+- Create interactive posts that can be set as public or private.
+- Engage with posts through upvotes, downvotes, and comments.
+- Take tests instantly based on the uploaded question papers.
+- Access and take tests for any publicly available question paper posts.
+- Track the marks scored for each test taken.
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
