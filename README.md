@@ -12,12 +12,12 @@ This app, built using ShadCN, Next.js, and TypeScript, enables students and user
 
 ## Features
 
-Upload PDFs or manually create question papers
-Text extraction with LLM integration
-Interactive posts (public/private)
-Upvotes/downvotes
-Comments for discussion
-Instant test-taking based on uploaded papers
+- Upload PDFs or manually create question papers
+- Text extraction with LLM integration
+- Interactive posts (public/private)
+- Upvotes/downvotes
+- Comments for discussion
+- Instant test-taking based on uploaded papers
 
 ## Tech Stack
 
