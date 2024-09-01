@@ -1,5 +1,5 @@
 {
-  "id": "a321c59f-a2c7-4ce7-ade7-df9f0cbbdcd0",
+  "id": "8e84f5fa-b531-4ae9-a3fe-53c04c9fa549",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
@@ -82,7 +82,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'1719593220502'"
+          "default": "'1725196513333'"
         },
         "user_id": {
           "name": "user_id",
@@ -343,7 +343,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'1719593220501'"
+          "default": "'1725196513331'"
         },
         "user_id": {
           "name": "user_id",
@@ -448,7 +448,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "tests_taken_user_id_users_id_fk": {

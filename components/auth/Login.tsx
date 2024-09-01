@@ -34,11 +34,12 @@ const Login: React.FC<LoginProps> = ({ setIsLogin }) => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      await SignIn(
+      const res = await SignIn(
         email,
         password,
         `${setIsLogin === undefined ? "/home" : pathname}`
       );
+      console.log("fron login " + res);
       setIsLoading(false);
       setEmail("");
       setPassword("");
@@ -46,7 +47,7 @@ const Login: React.FC<LoginProps> = ({ setIsLogin }) => {
     } catch (error) {
       if (error instanceof AuthError) {
         setIsLoading(false);
-        setError(error.message.split(".")[0].trim());
+        setError(error.message);
       }
       throw error;
     }
