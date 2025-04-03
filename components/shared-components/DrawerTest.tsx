@@ -30,7 +30,7 @@ import Login from "../auth/Login";
 import { useUserContext } from "@/context/UserContext";
 import { FileText, Loader2, Upload } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getArrayOfObjects } from "@/lib/actions";
+import { GoogleGenAI } from "@google/genai";
 import { cn } from "@/lib/utils";
 
 const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
@@ -46,6 +46,98 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { user, setUser } = useUserContext();
   const [arrayOfObjects, setArrayOfObjects] = useState<any>([]);
+
+
+
+  function fileToGenerativePart(buffer: string, mimeType: string) {
+    return {
+      inlineData: {
+        data: buffer,
+        mimeType,
+      },
+    };
+  }
+  
+  function toSuperscript(text: string): string {
+    const superscripts: { [key: string]: string } = {
+      "0": "⁰",
+      "1": "¹",
+      "2": "²",
+      "3": "³",
+      "4": "⁴",
+      "5": "⁵",
+      "6": "⁶",
+      "7": "⁷",
+      "8": "⁸",
+      "9": "⁹",
+      "-": "⁻",
+    };
+    return text
+      .split("")
+      .map((char) => superscripts[char] || char)
+      .join("");
+  }
+  
+async function getArrayOfObjects(base64: string) {
+    const genAI = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY as string,
+    });
+  
+    const prompt = `Extract all questions and answers from this PDF into a well-formed **JSON array**.
+  Strictly follow this format:
+  
+  [
+    {
+      "question": "Sample question?",
+      "answer": 1,
+      "options": [
+        { "option": "Option A" },
+        { "option": "Option B" },
+        { "option": "Option C" },
+        { "option": "Option D" }
+      ]
+    }
+  ]
+  
+  Ensure:
+  - The output is valid JSON.
+  - There is **no extra text** before or after the JSON.
+  - The JSON **must not be truncated**. If necessary, return the data in multiple responses instead of cutting it off.
+  - HTML tags like <sup>-1</sup> should be replaced with Unicode superscripts (e.g., "ms<sup>-1</sup>" → "ms⁻¹").`;
+  
+    const contents = [
+      { text: prompt },
+      fileToGenerativePart(base64, "application/pdf"),
+    ];
+  
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.5-pro-exp-03-25",
+      contents: contents,
+      config: {
+        maxOutputTokens: 32384,
+        temperature: 0.3,
+      },
+    });
+  
+    let jsonString = result?.text?.trim();
+    console.log("Raw Gemini Output: ", jsonString);
+    console.log("--end--");
+    // Remove unwanted backticks and ensure valid encoding
+    jsonString = jsonString
+      ?.replace(/```json|```/g, "") // Remove unnecessary backticks
+      ?.replace(/<sup>(.*?)<\/sup>/g, (_, exp) => toSuperscript(exp)); // Convert <sup> to Unicode
+  
+    try {
+      const resultArray = JSON.parse(jsonString!);
+      if (!Array.isArray(resultArray))
+        throw new Error("Parsed JSON is not an array.");
+      return resultArray;
+    } catch (error) {
+      console.error("JSON Parsing Error:", error);
+      return [];
+    }
+  }
+
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
