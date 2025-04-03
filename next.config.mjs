@@ -7,6 +7,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
+    serverActions: {
+      bodySizeLimit: "3mb"
+    },
     turbo: {
       resolveAlias: {
         canvas: "./empty-module.ts",

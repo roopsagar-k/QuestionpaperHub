@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -21,17 +22,16 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
-import { Test } from "@/app/types/types";
+import type { Test } from "@/app/types/types";
 import axios from "axios";
 import AuthModal from "../auth/AuthModal";
 import Register from "../auth/Register";
 import Login from "../auth/Login";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import pdfToImages from "@/lib/pdfToImage";
 import { useUserContext } from "@/context/UserContext";
-import { Loader2, Scroll } from "lucide-react";
-import { createWorker } from "tesseract.js";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { FileText, Loader2, Upload } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { getArrayOfObjects } from "@/lib/actions";
+import { cn } from "@/lib/utils";
 
 const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   const router = useRouter();
@@ -42,113 +42,30 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
-  const [text, setText] = useState<string>("");
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { user, setUser } = useUserContext();
   const [arrayOfObjects, setArrayOfObjects] = useState<any>([]);
 
-  const workerRef = useRef<Tesseract.Worker | null>(null);
-
-  useEffect(() => {
-    async function worker() {
-      workerRef.current = await createWorker({
-        logger: (message) => {
-          if ("progress" in message) {
-            console.log("progress", message.progress);
-            console.log(message.progress === 1 ? "Done" : message.status);
-          }
-        },
-      });
-    }
-    worker();
-    return () => {
-      workerRef.current?.terminate();
-      workerRef.current = null;
-    };
-  }, []);
-
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let files = e.target.files;
-    const worker = workerRef.current;
-    await worker?.load();
-    await worker?.loadLanguage("eng");
-    await worker?.initialize("eng");
-
-    let ocrText = "";
-
-    if (files && files[0].type === "application/pdf") {
-      setFile(files[0]);
-      setIsProcessing(true);
-      console.log("it is pdf");
-      const pdfUrl = URL.createObjectURL(files[0]);
-      const imageUrls = await pdfToImages(pdfUrl);
-      console.log("image urls", imageUrls);
-      for (let i = 0; i < imageUrls.length; i++) {
-        const response = await worker?.recognize(imageUrls[i]);
-        console.log(response?.data.text, "response");
-        ocrText += " " + response?.data.text;
-        setText((prev) => prev + " " + response?.data.text);
-      }
-      setIsProcessing(false);
+    const files = e.target.files;
+    if (!files || !files[0]) {
+      return;
     }
-
-    if (files && files[0].type === "image/*") {
-      setFile(files[0]);
-      setIsProcessing(true);
-      for (let i = 0; i < files.length; i++) {
-        const url = URL.createObjectURL(files[i]);
-        const response = await worker?.recognize(url);
-        console.log(response?.data.text, "response");
-        ocrText += " " + response?.data.text;
-        setText((prev) => prev + " " + response?.data.text);
-      }
-      setIsProcessing(false);
-      setIsLoading(true);
-    }
-
-    const blob = new Blob([ocrText], { type: "text/plain" });
-    const textFile = new File([blob], "converted-text.txt", {
-      type: "text/plain",
-    });
-    const textFileBuffer = await textFile.arrayBuffer();
-
-    function fileToGenerativePart(buffer: ArrayBuffer, mimeType: string) {
-      return {
-        inlineData: {
-          data: Buffer.from(buffer).toString("base64"),
-          mimeType,
-        },
-      };
-    }
-
-    const genAI = new GoogleGenerativeAI(
-      process.env.NEXT_PUBLIC_GEMINI_API_KEY as string
-    );
-
-    let resultArray = [];
-
+    setFile(files[0]);
     try {
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-      });
-      console.log("yo brew");
-      const prompt =
-        'Transform the PDF text or images text into an array of JavaScript objects following this structure: [{"question": "", "answer": optionNumber (1, 2, ...), "options": [{"option": ""}, {"option": ""}]}]. Correct any odd symbols, including mathematical, physics, and chemistry symbols, to their correct representations using the actual forms of these symbols (e.g., use "²" instead of "^2" or "<sup>2</sup>"). Ensure the output is in plain JSON format, parsable by JSON.parse(), and does not include any introductory text, variable declarations, or enclosing tags. Make sure to complete the JSON array properly, even if it means missing some questions.';
-      const result = await model.generateContent([
-        prompt,
-        fileToGenerativePart(textFileBuffer, "text/plain"),
-      ]);
-      console.log("Gemini Result: ", result.response);
-      let jsonString = result.response.text().trim();
-      jsonString = jsonString.replace(/```/g, "").replace(/[^\x20-\x7E]/g, "");
-      console.log("JSON String: ", jsonString);
-      resultArray = JSON.parse(jsonString);
+      setIsLoading(true);
+      setErrorMessage("");
+      const resultArray = await getArrayOfObjects(
+        Buffer.from(await files[0].arrayBuffer()).toString("base64")
+      );
       setArrayOfObjects(resultArray);
       setIsLoading(false);
-      console.log("Array of Objects: ", resultArray);
     } catch (error) {
       setIsLoading(false);
+      setErrorMessage(
+        "Error occurred while parsing the PDF. Please try again."
+      );
       console.error("Error occurred while parsing the pdf:", error);
     }
   };
@@ -161,47 +78,50 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
     const data: Test = {
       title: titleInput.value,
       description: e.currentTarget.description.value,
-      duration: parseInt(e.currentTarget.duration.value),
+      duration: Number.parseInt(e.currentTarget.duration.value),
       tags: e.currentTarget.tags.value,
       ownTest: ownTest,
       privatePost: privatePost,
     };
+
+    setIsProcessing(true);
     let testId = "";
-    if (file && !ownTest) {
-      try {
-        console.log("REACHED BEFORE AXIOS");
+
+    try {
+      if (file && !ownTest) {
         const response = await axios.post("api/tests/file", {
           arrayOfObjects,
           data,
         });
-        console.log("REACHED AFTER AXIOS");
         testId = response.data.testId;
-        console.log("respnse 201 chekc", response);
+
         if (response.data.error) {
-          console.log(response.data.error);
+          throw new Error(response.data.error);
         }
+
         if (response.status === 201) {
           router.push(`/create-paper/${testId}`);
         } else {
-          setErrorMessage("Failed to parse your pdf file.");
+          throw new Error("Failed to parse your PDF file.");
         }
-      } catch (error) {
-        setErrorMessage("Failed to parse your pdf file.");
-        console.error("Error creating test: ", error);
-      }
-    } else if (ownTest) {
-      try {
+      } else if (ownTest) {
         const res = await axios.post("api/tests", data);
         testId = res.data.testId;
-        if (data.ownTest) {
-          router.push(`/create-paper/${testId}`);
-          return;
-        }
-      } catch (error) {
-        console.error("Error creating test: ", error);
+        router.push(`/create-paper/${testId}`);
       }
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while creating the test."
+      );
+      console.error("Error creating test: ", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
+
+  const isSubmitDisabled = isProcessing || isLoading || (!ownTest && !file);
 
   return (
     <>
@@ -219,161 +139,215 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
           onClick={() =>
             user ? setOpenDrawer(true) : setOpenLoginDialog(true)
           }
+          className="cursor-pointer"
         >
           {children}
         </div>
         <DrawerContent className="sm:px-[10%] md:px-[15%] lg:px-[20%]">
-          <form onSubmit={(e) => handleSubmit(e)}>
-            <ScrollArea type="scroll" className={`${openDrawer && "max-h-[97vh] overflow-auto md:max-h-auto"}`}>
-              <DrawerHeader>
-                <DrawerTitle>Test creation</DrawerTitle>
-                <DrawerDescription>
-                  <p className="text-destructive">
-                    {errorMessage && errorMessage}
-                  </p>
-                  Create test by uploading PDF/Images or Add the questions and
-                  options manually
+          <form onSubmit={handleSubmit}>
+            <ScrollArea className="max-h-[85vh] overflow-y-auto px-6 md:max-h-[90vh]">
+              <DrawerHeader className="px-0 pt-6">
+                <DrawerTitle className="text-2xl font-bold text-primary">
+                  Create New Test
+                </DrawerTitle>
+                {errorMessage && (
+                  <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md mt-3 border border-destructive/20">
+                    {errorMessage}
+                  </div>
+                )}
+                <DrawerDescription className="mt-2 text-muted-foreground">
+                  Create a test by uploading a PDF/Images or add questions
+                  manually
                 </DrawerDescription>
-                <div className="flex flex-col gap-2">
+
+                <div className="mt-8 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card className="flex flex-col gap-3 items-center text-justify sm:flex-row sm:items-start shadow-md sm:text-left p-3">
-                      <div>
-                        <CardTitle className="text-md">
-                          Compose Your Own Test
-                        </CardTitle>
-                        <CardDescription className="text-xs sm:text-sm">
-                          Manually add questions, options, answers, and attach
-                          PDFs/images to create your own question paper.
-                        </CardDescription>
-                      </div>
-                      <Switch
-                        id="own-test"
-                        name="ownTest"
-                        checked={ownTest}
-                        value={ownTest ? "on" : "off"}
-                        onCheckedChange={() => setOwnTest(!ownTest)}
-                      />
-                    </Card>
-                    <Card className="flex flex-col gap-3 items-center text-justify shadow-md sm:flex-row sm:items-start sm:text-left p-3">
-                      <div>
-                        <CardTitle className=" text-md">Private post</CardTitle>
-                        <CardDescription className="text-xs">
-                          By checking this, your post or test will be visible
-                          only to those who access them via links, not even to
-                          your followers.
-                        </CardDescription>
-                      </div>
-                      <Switch
-                        id="private-post"
-                        name="privatePost"
-                        value={privatePost ? "on" : "off"}
-                        checked={privatePost}
-                        onCheckedChange={() => setPrivatePost(!privatePost)}
-                      />
-                    </Card>
-                  </div>
-                  <Card className="flex items-center justify-center shadow-md relative">
-                    <CardContent className="flex flex-col items-center justify-center mt-4">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-12 h-12"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
-                          clipRule="evenodd"
+                    <Card className="border-2 hover:border-primary/50 transition-colors duration-200">
+                      <CardContent className="flex flex-col sm:flex-row items-start gap-4 justify-between p-4">
+                        <div>
+                          <CardTitle className="text-lg mb-2">
+                            Compose Your Own Test
+                          </CardTitle>
+                          <CardDescription>
+                            Manually add questions, options, and answers
+                          </CardDescription>
+                        </div>
+                        <Switch
+                          id="own-test"
+                          checked={ownTest}
+                          onCheckedChange={() => setOwnTest(!ownTest)}
+                          className="mt-1"
                         />
-                      </svg>
-                      <CardDescription className="text-primary">
-                        <p>Choose PDF/images or drag and drop</p>
-                        <p className="text-center text-white  underline">
-                          {file ? file.name : ""}
-                        </p>
-                      </CardDescription>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-2 hover:border-primary/50 transition-colors duration-200">
+                      <CardContent className="flex flex-col sm:flex-row items-start gap-4 justify-between p-4">
+                        <div>
+                          <CardTitle className="text-lg mb-2">
+                            Private Post
+                          </CardTitle>
+                          <CardDescription>
+                            Only accessible via direct link
+                          </CardDescription>
+                        </div>
+                        <Switch
+                          id="private-post"
+                          checked={privatePost}
+                          onCheckedChange={() => setPrivatePost(!privatePost)}
+                          className="mt-1"
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card
+                    className={cn(
+                      "relative overflow-hidden border-2 border-dashed",
+                      file
+                        ? "border-primary/70 bg-primary/5"
+                        : "border-muted-foreground/30 hover:border-primary/30",
+                      ownTest ? "opacity-50" : "" // Removed pointer-events-none here
+                    )}
+                  >
+                    <CardContent className="flex flex-col items-center justify-center py-10 px-4">
+                      {file ? (
+                        <div className="flex items-center gap-3">
+                          <div className="bg-primary/10 p-3 rounded-full">
+                            <FileText className="w-8 h-8 text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-medium">{file.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {(file.size / (1024 * 1024)).toFixed(2)} MB
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <div className="bg-muted p-4 rounded-full inline-flex mb-4">
+                            <Upload className="w-10 h-10 text-muted-foreground" />
+                          </div>
+                          <p className="text-lg font-medium">
+                            Choose PDF or drag and drop
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                            PDF is supported. Upload your test document to
+                            automatically generate questions.
+                          </p>
+                        </div>
+                      )}
+
+                      {(isLoading || isProcessing) && (
+                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                          <div className="text-center bg-background p-6 rounded-lg shadow-lg">
+                            <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
+                            <p className="font-medium text-lg">
+                              {isLoading
+                                ? "Processing your document..."
+                                : "Creating test..."}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-2">
+                              This may take a moment
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
-                    <Input
-                      className="w-full h-full absolute opacity-0"
-                      id="file"
-                      name="file"
-                      onChange={(e) => onFileChange(e)}
-                      multiple={true}
-                      type="file"
-                      required={!ownTest}
-                      disabled={ownTest}
-                      accept="image/*, application/pdf"
-                    />
+
+                    {!ownTest && (
+                      <Input
+                        className="absolute top-0 bottom-0 z-50 w-full h-full opacity-0 cursor-pointer "
+                        type="file"
+                        onChange={onFileChange}
+                        accept="application/pdf"
+                        disabled={isLoading || isProcessing}
+                      />
+                    )}
                   </Card>
-                  <div className="flex mt-4 gap-4">
-                    <div className="flex flex-col w-full gap-2">
-                      <Label htmlFor="title">Title</Label>
-                      <Input
-                        id="title"
-                        name="title"
-                        placeholder="Title"
-                        type="text"
+
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="title" className="text-sm font-medium">
+                          Test Title
+                        </Label>
+                        <Input
+                          id="title"
+                          placeholder="Enter test title"
+                          required
+                          className="h-11"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="duration"
+                          className="text-sm font-medium"
+                        >
+                          Duration (minutes)
+                        </Label>
+                        <Input
+                          id="duration"
+                          type="number"
+                          placeholder="Enter duration"
+                          required
+                          className="h-11"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="description"
+                        className="text-sm font-medium"
+                      >
+                        Description
+                      </Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Describe your test..."
+                        className="min-h-[120px] resize-y"
                         required
                       />
                     </div>
-                    <div className="flex flex-col w-full gap-2">
-                      <Label htmlFor="title">Duration in mins</Label>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tags" className="text-sm font-medium">
+                        Tags
+                      </Label>
                       <Input
-                        id="duration"
-                        name="duration"
-                        type="number"
-                        placeholder="Enter the test duration in minutes"
+                        id="tags"
+                        placeholder="Add tags (comma-separated)"
                         required
+                        className="h-11"
                       />
                     </div>
-                  </div>
-                  <div className="flex flex-col mt-4 gap-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      typeof="text"
-                      className="min-h-32"
-                      id="description"
-                      name="description"
-                      placeholder="Share your thoughts about this post..."
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col mt-4 gap-2">
-                    <Label htmlFor="tags">Tags</Label>
-                    <Input
-                      id="tags"
-                      name="tags"
-                      type="text"
-                      placeholder="Add relevant tags (comma-separated)"
-                      required
-                    />
                   </div>
                 </div>
               </DrawerHeader>
-              <DrawerFooter>
-                <Button disabled={isProcessing || isLoading} type="submit">
-                  {isProcessing && (
-                    <div className="flex gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>
-                        Performing OCR on your document. Sit tight, this might
-                        take a moment...
-                      </span>
+
+              <DrawerFooter className="px-0 pb-8 pt-6">
+                <Button
+                  type="submit"
+                  disabled={isSubmitDisabled}
+                  className="w-full h-12 text-base font-medium"
+                >
+                  {isProcessing ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Creating test...</span>
                     </div>
-                  )}
-                  {isLoading ? (
-                    <div className="flex gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>
-                        Hang tight! Gemini AI is working its magic ✨
-                      </span>{" "}
+                  ) : isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Processing document...</span>
                     </div>
                   ) : (
-                    !isProcessing && <span>Submit</span>
+                    "Create Test"
                   )}
                 </Button>
-                <DrawerClose>
-                  <Button variant="outline" className="w-full" type="button">
+                <DrawerClose asChild>
+                  <Button variant="outline" className="w-full h-12 text-base">
                     Cancel
                   </Button>
                 </DrawerClose>
@@ -382,7 +356,6 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
           </form>
         </DrawerContent>
       </Drawer>
-      <script src="pdf.mjs" type="module" />
     </>
   );
 };

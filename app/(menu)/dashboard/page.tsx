@@ -15,6 +15,7 @@ import moment from "moment";
 import { Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
+import LoadingAnimation from "@/components/LoadingAnimation";
 
 type UserTestTakenType = {
   tests: Test;
@@ -25,15 +26,28 @@ const Dashboard = () => {
   const [takenTests, setTakenTests] = useState<UserTestTakenType[]>();
   const router = useRouter();
   const isPhoneView = useMediaQuery({ query: "(max-width: 767px)" });
+  const [loading, setIsloading] = useState(false);
+
   useEffect(() => {
     async function fetchTestsTaken() {
+      setIsloading(true);
       const response = await axios.get("api/tests-taken");
       const { testsTaken }: { testsTaken: UserTestTakenType[] } = response.data;
       console.log("records : ", testsTaken);
       setTakenTests(testsTaken);
+      setIsloading(false);
     }
     fetchTestsTaken();
   }, []);
+
+  if(loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <LoadingAnimation />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-3 sm:p-6 md:p-8 lg:p-10 xl:p-12 flex flex-col items-center">
       {takenTests?.length! > 0 ? (

@@ -27,19 +27,32 @@ import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useMediaQuery } from "react-responsive";
+import LoadingAnimation from "@/components/LoadingAnimation";
 
 const TestsCreated = () => {
   const [tests, setTests] = useState<Test[]>([]);
   const isPhoneView = useMediaQuery({ query: "(max-width: 767px)" });
   const router = useRouter();
+  const [loading, setIsLoading] = useState(false);
+
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       const response = await axios.get("/api/tests");
       console.log("my qps : ", response?.data);
       setTests(response?.data);
+      setIsLoading(false);
     }
     fetchData();
   }, []);
+
+   if (loading) {
+     return (
+       <div className="w-full h-screen flex items-center justify-center">
+         <LoadingAnimation />
+       </div>
+     );
+   }
 
   const handleSwitchChange = async (testId: string | undefined) => {
     const test = tests.find((test) => test.id === testId);
