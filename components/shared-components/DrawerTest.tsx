@@ -80,7 +80,7 @@ const DrawerTest = ({ children }: { children?: React.ReactNode }) => {
   
 async function getArrayOfObjects(base64: string) {
     const genAI = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY as string,
+      apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY as string,
     });
   
     const prompt = `Extract all questions and answers from this PDF into a well-formed **JSON array**.
