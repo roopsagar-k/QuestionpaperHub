@@ -6,9 +6,6 @@ import { TestTable } from "./drizzle/schema";
 import { QuestionType } from "@/app/types/types";
 import { TestInfo } from "@/app/types/types";
 import nodemailer from "nodemailer";
-import { GoogleGenAI } from "@google/genai";
-
-export const maxDuration = 60;
 
 
 export async function addToBookMark(postId: string, userId: string) {
